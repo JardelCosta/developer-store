@@ -18,6 +18,19 @@ internal sealed class CreateSaleCommandHandler(IApplicationDbContext repository)
             return Result.Failure<Guid>(SaleErrors.AlreadyExists(command.SaleNumber));
         }
 
+        Sale sale = CreateSale(command);
+
+        sale.Raise(new CreatedSaleDomainEvent(sale.Id));
+
+        repository.Sales.Add(sale);
+
+        await repository.SaveChangesAsync(cancellationToken);
+
+        return sale.Id;
+    }
+
+    private Sale CreateSale(CreateSaleCommand command)
+    {
         var sale = new Sale(
             command.SaleNumber,
             command.SaleDate,
@@ -29,12 +42,6 @@ internal sealed class CreateSaleCommandHandler(IApplicationDbContext repository)
             sale.AddItem(item.ToDomain());
         }
 
-        sale.Raise(new CreatedSaleDomainEvent(sale.Id));
-
-        repository.Sales.Add(sale);
-
-        await repository.SaveChangesAsync(cancellationToken);
-
-        return sale.Id;
+        return sale;
     }
 }

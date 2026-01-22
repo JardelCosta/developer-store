@@ -22,7 +22,7 @@ public sealed class ApplicationDbContext : DbContext, IApplicationDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-        modelBuilder.Entity<ExternalIdentity>().HasNoKey();
+        modelBuilder.Ignore<ExternalIdentity>();
         modelBuilder.HasDefaultSchema(Schemas.Default);
     }
 

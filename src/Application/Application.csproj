@@ -18,8 +18,4 @@
 	<InternalsVisibleTo Include="Application.UnitTests" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="UseCases\Sales\Queries\" />
-  </ItemGroup>
-
 </Project>

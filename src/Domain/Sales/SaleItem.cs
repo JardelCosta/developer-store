@@ -6,13 +6,15 @@ public class SaleItem
 {
     public Guid Id { get; private set; }
     public Guid SaleId { get; set; }
-    public ExternalIdentity Product { get; private set; }
+    public Guid ProductId { get; set; }
+    public string ProductDescription { get; set; }
     public int Quantity { get; private set; }
     public decimal UnitPrice { get; private set; }
     public decimal Discount { get; private set; }
     public decimal TotalAmount { get; private set; }
     public bool IsCancelled { get; private set; }
     public Sale Sale { get; set; }
+    public ExternalIdentity Product { get; set; }
 
     protected SaleItem() { }
 
@@ -23,7 +25,8 @@ public class SaleItem
     {
         ValidateQuantity(quantity);
         Id = Guid.NewGuid();
-        Product = product;
+        ProductId = product.ExternalId;
+        ProductDescription = product.Description;
         Quantity = quantity;
         UnitPrice = unitPrice;
         Discount = CalculateDiscount();
