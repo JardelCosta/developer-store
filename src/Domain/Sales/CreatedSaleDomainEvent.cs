@@ -1,4 +1,4 @@
-﻿using Domain.Common;
+﻿using SharedKernel;
 
 namespace Domain.Sales;
 

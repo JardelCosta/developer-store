@@ -1,9 +1,9 @@
 ﻿using Application.UseCases.Sales.DTOs;
-using Domain;
+using SharedKernel;
 
 namespace Application.Mappings;
 
 public static class SaleMapper
 {
-    public static ExternalIdentity ToDomain(this ExternalIdentityDTO dto) => new(dto.Id, dto.Description);
+    public static ExternalIdentity ToDomain(this ExternalIdentityDto dto) => new(dto.Id, dto.Description);
 }

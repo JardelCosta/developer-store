@@ -1,0 +1,47 @@
+services:
+  web-api:
+    image: ${DOCKER_REGISTRY-}webapi
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__Database=${DATABASE_CONNECTION}
+    container_name: web-api
+    build:
+      context: .
+      dockerfile: src/Web.Api/Dockerfile
+    depends_on:
+      - postgres
+    ports:
+      - "5000:8080"
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 512M
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      - POSTGRES_DB=liturgiadb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./DbScripts:/dbscripts
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.7'
+          memory: 512M
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  pgdata:
+  seq_data:

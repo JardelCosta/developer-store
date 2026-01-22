@@ -1,11 +1,14 @@
-﻿using Application.UseCases.Sales.DTOs;
-using Mediator;
+﻿using Application.Abstractions.Messaging;
+using Application.UseCases.Sales.DTOs;
+
 
 namespace Application.UseCases.Sales.Commands.CreateSale;
 
-public record CreateSaleCommand(
-                                string SaleNumber,
-                                DateTime SaleDate,
-                                ExternalIdentityDTO Customer,
-                                ExternalIdentityDTO Branch,
-                                List<CreateSaleItemDTO> Items) : IRequest<Guid>;
+public class CreateSaleCommand : ICommand<Guid>
+{
+    public string SaleNumber { get; set; }
+    public DateTime SaleDate { get; set; }
+    public ExternalIdentityDto Customer { get; set; }
+    public ExternalIdentityDto Branch { get; set; }
+    public List<SaleItemDto> Items { get; set; } = [];
+}

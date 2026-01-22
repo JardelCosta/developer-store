@@ -1,21 +1,30 @@
 ﻿using Application.Abstractions.Data;
+using Application.Abstractions.Messaging;
 using Application.Mappings;
+using Application.UseCases.Sales.DTOs;
 using Domain.Sales;
-using Mediator;
+using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace Application.UseCases.Sales.Commands.CreateSale;
 
-internal sealed class CreateSaleCommandHandler(IApplicationDbContext repository) : IRequestHandler<CreateSaleCommand, Guid>
+internal sealed class CreateSaleCommandHandler(IApplicationDbContext repository) : ICommandHandler<CreateSaleCommand, Guid>
 {
-    public async ValueTask<Guid> Handle(CreateSaleCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateSaleCommand command, CancellationToken cancellationToken)
     {
+        Sale? entity = await repository.Sales.AsNoTracking().SingleOrDefaultAsync(u => u.SaleNumber == command.SaleNumber, cancellationToken);
+        if (entity is not null)
+        {
+            return Result.Failure<Guid>(SaleErrors.AlreadyExists(command.SaleNumber));
+        }
+
         var sale = new Sale(
             command.SaleNumber,
             command.SaleDate,
             command.Customer.ToDomain(),
             command.Branch.ToDomain());
 
-        foreach (var item in command.Items)
+        foreach (SaleItemDto item in command.Items)
         {
             sale.AddItem(item.ToDomain());
         }

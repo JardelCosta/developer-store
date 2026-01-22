@@ -1,22 +1,24 @@
-﻿using Domain.Common;
-using Domain.Exceptions;
+﻿using SharedKernel;
 
 namespace Domain.Sales;
+
 public class Sale : Entity
 {
     private readonly List<SaleItem> _items = [];
 
     public Guid Id { get; private set; }
     public string SaleNumber { get; private set; }
+    public Guid CustomerId { get; private set; }
+    public Guid BranchId { get; private set; }
+    public string CustomerDescription { get; private set; }
+    public string BranchDescription { get; private set; }
     public DateTime SaleDate { get; private set; }
-
-    public ExternalIdentity Customer { get; private set; }
-    public ExternalIdentity Branch { get; private set; }
-
-    public IReadOnlyCollection<SaleItem> Items => _items;
-
     public decimal TotalAmount { get; private set; }
     public bool IsCancelled { get; private set; }
+
+    public IReadOnlyCollection<SaleItem> Items => _items;
+    public virtual ExternalIdentity Customer { get; set; }
+    public virtual ExternalIdentity Branch { get; set; }
 
     protected Sale() { }
 
@@ -25,15 +27,17 @@ public class Sale : Entity
         Id = Guid.NewGuid();
         SaleNumber = saleNumber;
         SaleDate = saleDate;
-        Customer = customer;
-        Branch = branch;
+        CustomerId = customer.ExternalId;
+        BranchId = branch.ExternalId;
+        CustomerDescription = customer.Description;
+        BranchDescription = branch.Description;
     }
 
     public void AddItem(SaleItem item)
     {
         if (IsCancelled)
         {
-            throw new DomainException("Cannot add items to a cancelled sale.");
+            throw new DomainException(SaleErrors.CancelledSale().Description);
         }
 
         _items.Add(item);
@@ -43,11 +47,14 @@ public class Sale : Entity
 
     public void Cancel()
     {
-        if (IsCancelled) return;
+        if (IsCancelled)
+        {
+            return;
+        }
 
         IsCancelled = true;
 
-        foreach (var item in _items)
+        foreach (SaleItem item in _items)
         {
             item.Cancel();
         }
@@ -57,8 +64,8 @@ public class Sale : Entity
 
     public void CancelItem(Guid itemId)
     {
-        var item = _items.FirstOrDefault(i => i.Id == itemId)
-            ?? throw new DomainException("Item not found.");
+        SaleItem item = _items.FirstOrDefault(i => i.Id == itemId)
+            ?? throw new DomainException(SaleErrors.NotFound(itemId).Description);
 
         item.Cancel();
         RecalculateTotal();
