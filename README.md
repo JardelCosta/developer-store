@@ -1,6 +1,6 @@
 # DeveloperStore - Sales API
 
-This project is an API prototype developed as part of a technical evaluation for the **DeveloperStore** team.
+This project is an API prototype developed as part of a technical evaluation.
 
 The solution implements a **complete CRUD for sales records**, applying **Clean Architecture**, **Domain-Driven Design (DDD)**, and the **Result Pattern** to ensure clear separation of concerns, business rule consistency, and predictable error handling.
 
@@ -19,7 +19,7 @@ src/
  |-- SharedKernel      -> Result, Error, base abstractions
 ```
 
-### Key Architectural Decisions
+### Architectural Decisions
 
 - **DDD (Domain-Driven Design)**  
   Business rules are enforced exclusively inside the Domain layer.
@@ -43,7 +43,7 @@ src/
 
 ## Domain Model
 
-### Sale (Aggregate Root)
+### Sale
 
 A sale contains:
 - Sale number
