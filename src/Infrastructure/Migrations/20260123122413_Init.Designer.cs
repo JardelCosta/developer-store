@@ -9,10 +9,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Database.Migrations
+namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260122215019_Init")]
+    [Migration("20260123122413_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -21,7 +21,7 @@ namespace Infrastructure.Database.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("public")
-                .HasAnnotation("ProductVersion", "9.0.4")
+                .HasAnnotation("ProductVersion", "8.0.23")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -74,9 +74,9 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnName("total_amount");
 
                     b.HasKey("Id")
-                        .HasName("pk_sales");
+                        .HasName("pk_sale");
 
-                    b.ToTable("sales", "public");
+                    b.ToTable("sale", "public");
                 });
 
             modelBuilder.Entity("Domain.Sales.SaleItem", b =>
@@ -95,6 +95,15 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false)
                         .HasColumnName("is_cancelled");
+
+                    b.Property<string>("ProductDescription")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("product_description");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("product_id");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer")
@@ -123,20 +132,6 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("sale_item", "public");
                 });
 
-            modelBuilder.Entity("SharedKernel.ExternalIdentity", b =>
-                {
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<Guid>("ExternalId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("external_id");
-
-                    b.ToTable("external_identity", "public");
-                });
-
             modelBuilder.Entity("Domain.Sales.SaleItem", b =>
                 {
                     b.HasOne("Domain.Sales.Sale", "Sale")
@@ -144,7 +139,7 @@ namespace Infrastructure.Database.Migrations
                         .HasForeignKey("SaleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_sale_item_sales_sale_id");
+                        .HasConstraintName("fk_sale_item_sale_sale_id");
 
                     b.Navigation("Sale");
                 });

@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Infrastructure.Database.Migrations;
+namespace Infrastructure.Migrations;
 
 /// <inheritdoc />
 public partial class Init : Migration
@@ -14,19 +14,7 @@ public partial class Init : Migration
             name: "public");
 
         migrationBuilder.CreateTable(
-            name: "external_identity",
-            schema: "public",
-            columns: table => new
-            {
-                external_id = table.Column<Guid>(type: "uuid", nullable: false),
-                description = table.Column<string>(type: "text", nullable: false)
-            },
-            constraints: table =>
-            {
-            });
-
-        migrationBuilder.CreateTable(
-            name: "sales",
+            name: "sale",
             schema: "public",
             columns: table => new
             {
@@ -40,7 +28,7 @@ public partial class Init : Migration
                 total_amount = table.Column<decimal>(type: "numeric", nullable: false),
                 is_cancelled = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
             },
-            constraints: table => table.PrimaryKey("pk_sales", x => x.id));
+            constraints: table => table.PrimaryKey("pk_sale", x => x.id));
 
         migrationBuilder.CreateTable(
             name: "sale_item",
@@ -49,6 +37,8 @@ public partial class Init : Migration
             {
                 id = table.Column<Guid>(type: "uuid", nullable: false),
                 sale_id = table.Column<Guid>(type: "uuid", nullable: false),
+                product_id = table.Column<Guid>(type: "uuid", nullable: false),
+                product_description = table.Column<string>(type: "text", nullable: false),
                 quantity = table.Column<int>(type: "integer", nullable: false),
                 unit_price = table.Column<decimal>(type: "numeric", nullable: false),
                 discount = table.Column<decimal>(type: "numeric", nullable: false),
@@ -59,10 +49,10 @@ public partial class Init : Migration
             {
                 table.PrimaryKey("pk_sale_item", x => x.id);
                 table.ForeignKey(
-                    name: "fk_sale_item_sales_sale_id",
+                    name: "fk_sale_item_sale_sale_id",
                     column: x => x.sale_id,
                     principalSchema: "public",
-                    principalTable: "sales",
+                    principalTable: "sale",
                     principalColumn: "id",
                     onDelete: ReferentialAction.Cascade);
             });
@@ -78,15 +68,11 @@ public partial class Init : Migration
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropTable(
-            name: "external_identity",
-            schema: "public");
-
-        migrationBuilder.DropTable(
             name: "sale_item",
             schema: "public");
 
         migrationBuilder.DropTable(
-            name: "sales",
+            name: "sale",
             schema: "public");
     }
 }
