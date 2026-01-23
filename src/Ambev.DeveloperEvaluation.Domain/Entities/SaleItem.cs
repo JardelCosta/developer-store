@@ -156,7 +156,7 @@ public class SaleItem
     /// <item>Discount is calculated based on quantity thresholds</item>
     /// </list>
     /// </remarks>
-    public static void CreateOrUpdate(ExternalIdentity product, int quantity, decimal unitPrice)
+    public static SaleItem CreateOrUpdate(ExternalIdentity product, int quantity, decimal unitPrice)
     {
         if (quantity <= 0)
         {
@@ -170,6 +170,6 @@ public class SaleItem
 
         decimal discount = CalculateDiscount(quantity, unitPrice);
 
-        var item = new SaleItem(product, quantity, unitPrice, discount);
+        return new SaleItem(product, quantity, unitPrice, discount);
     }
 }
