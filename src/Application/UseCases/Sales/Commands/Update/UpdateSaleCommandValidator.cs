@@ -1,11 +1,14 @@
 ﻿using FluentValidation;
 
-namespace Application.UseCases.Sales.Commands.Create;
+namespace Application.UseCases.Sales.Commands.Update;
 
-public class CreateSaleCommandValidator : AbstractValidator<CreateSaleCommand>
+public class UpdateSaleCommandValidator : AbstractValidator<UpdateSaleCommand>
 {
-    public CreateSaleCommandValidator()
+    public UpdateSaleCommandValidator()
     {
+        RuleFor(c => c.SaleId)
+            .NotEmpty().WithMessage("Sale ID is required.");
+
         RuleFor(x => x.SaleNumber)
             .NotEmpty().WithMessage("Sale number is required.")
             .MaximumLength(50).WithMessage("Sale number cannot exceed 50 characters.");
@@ -34,8 +37,6 @@ public class CreateSaleCommandValidator : AbstractValidator<CreateSaleCommand>
             .NotEmpty().WithMessage("At least one item is required.")
             .ForEach(item => item.ChildRules(i =>
             {
-                i.RuleFor(it => it.Product).NotNull().WithMessage("Product is required.");
-                i.RuleFor(it => it.Product.Id).NotEmpty().WithMessage("Product ID is required.");
                 i.RuleFor(it => it.Quantity).GreaterThan(0).WithMessage("Quantity must be greater than zero.");
                 i.RuleFor(it => it.UnitPrice).GreaterThanOrEqualTo(0).WithMessage("Unit price cannot be negative.");
             }));

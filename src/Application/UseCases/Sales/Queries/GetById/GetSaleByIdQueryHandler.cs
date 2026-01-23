@@ -19,7 +19,7 @@ internal sealed class GetSaleByIdQueryHandler(IApplicationDbContext context)
 
         if (sale is null)
         {
-            return Result.Failure<SaleResponse>(SaleErrors.NotFound(query.SaleId));
+            return Result.Failure<SaleResponse>(SaleErrors.NotFound(query.SaleId.ToString()));
         }
 
         return sale;

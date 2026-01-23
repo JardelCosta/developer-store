@@ -37,7 +37,7 @@ public static class SaleErrors
         return Error.Problem("Sale.AlreadyExists", $"The sale item with Number = '{saleNumber}' already exists.");
     }
 
-    public static Error NotFound(Guid saleId)
+    public static Error NotFound(string saleId)
     {
         return Error.NotFound("Sale.NotFound", $"The sale with the Id = '{saleId}' was not found");
     }

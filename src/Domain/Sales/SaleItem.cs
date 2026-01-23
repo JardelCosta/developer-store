@@ -52,7 +52,7 @@ public class SaleItem
         return 0;
     }
 
-    public static Result<SaleItem> Create(ExternalIdentity product, int quantity, decimal unitPrice)
+    public static Result<SaleItem> CreateOrUpdate(ExternalIdentity product, int quantity, decimal unitPrice)
     {
         if (quantity <= 0)
         {

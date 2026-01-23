@@ -6,19 +6,19 @@ using Domain.Sales;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
-namespace Application.UseCases.Sales.Commands.Create;
+namespace Application.UseCases.Sales.Commands.Update;
 
-internal sealed class CreateSaleCommandHandler(IApplicationDbContext context) : ICommandHandler<CreateSaleCommand, Guid>
+internal sealed class UpdateSaleCommandHandler(IApplicationDbContext context) : ICommandHandler<UpdateSaleCommand, Guid>
 {
-    public async Task<Result<Guid>> Handle(CreateSaleCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(UpdateSaleCommand command, CancellationToken cancellationToken)
     {
-        Sale? entity = await context.Sales.AsNoTracking().SingleOrDefaultAsync(u => u.SaleNumber == command.SaleNumber, cancellationToken);
-        if (entity is not null)
+        Sale? entity = await context.Sales.SingleOrDefaultAsync(u => u.SaleNumber == command.SaleNumber, cancellationToken);
+        if (entity is null)
         {
-            return Result.Failure<Guid>(SaleErrors.AlreadyExists(command.SaleNumber));
+            return Result.Failure<Guid>(SaleErrors.NotFound(command.SaleNumber));
         }
 
-        Result<Sale> result = CreateSale(command);
+        Result<Sale> result = UpdateSale(entity, command);
 
         if (result.IsFailure)
         {
@@ -27,7 +27,7 @@ internal sealed class CreateSaleCommandHandler(IApplicationDbContext context) : 
 
         Sale sale = result.Value;
 
-        sale.Raise(new CreatedSaleDomainEvent(sale.Id));
+        sale.Raise(new UpdateSaleDomainEvent(sale.Id));
 
         context.Sales.Add(sale);
 
@@ -36,9 +36,9 @@ internal sealed class CreateSaleCommandHandler(IApplicationDbContext context) : 
         return sale.Id;
     }
 
-    private Result<Sale> CreateSale(CreateSaleCommand command)
+    private Result<Sale> UpdateSale(Sale sale, UpdateSaleCommand command)
     {
-        var sale = new Sale(
+        sale.Update(
             command.SaleNumber,
             command.SaleDate,
             command.Customer.ToDomain(),

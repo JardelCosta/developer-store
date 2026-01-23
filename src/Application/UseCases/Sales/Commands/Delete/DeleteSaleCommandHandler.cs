@@ -14,7 +14,7 @@ internal sealed class DeleteSaleCommandHandler(IApplicationDbContext context) : 
 
         if (sale is null)
         {
-            return Result.Failure(SaleErrors.NotFound(command.Id));
+            return Result.Failure(SaleErrors.NotFound(command.Id.ToString()));
         }
 
         context.Sales.Remove(sale);

@@ -34,6 +34,23 @@ public class Sale : Entity
         BranchDescription = branch.Description;
     }
 
+    public Result Update(string saleNumber, DateTime saleDate, ExternalIdentity customer, ExternalIdentity branch)
+    {
+        if (IsCancelled)
+        {
+            return Result.Failure<Sale>(SaleErrors.CancelledSale());
+        }
+
+        SaleNumber = saleNumber;
+        SaleDate = saleDate;
+        CustomerId = customer.ExternalId;
+        BranchId = branch.ExternalId;
+        CustomerDescription = customer.Description;
+        BranchDescription = branch.Description;
+
+        return Result.Success();
+    }
+
     public Result AddItem(SaleItem item)
     {
         if (IsCancelled)
@@ -70,7 +87,7 @@ public class Sale : Entity
         SaleItem item = _items.FirstOrDefault(i => i.Id == itemId);
         if (item == null)
         {
-            return Result.Failure(SaleErrors.NotFound(itemId));
+            return Result.Failure(SaleErrors.NotFound(itemId.ToString()));
         }
 
         item.Cancel();

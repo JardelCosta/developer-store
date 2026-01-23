@@ -13,7 +13,7 @@ internal sealed class CancelSaleCommandHandler(IApplicationDbContext repository)
         Sale? sale = await repository.Sales.Include(x => x.Items).SingleOrDefaultAsync(u => u.Id == command.Id, cancellationToken);
         if (sale is null)
         {
-            return Result.Failure<Guid>(SaleErrors.NotFound(command.Id));
+            return Result.Failure<Guid>(SaleErrors.NotFound(command.Id.ToString()));
         }
 
         sale.Cancel();

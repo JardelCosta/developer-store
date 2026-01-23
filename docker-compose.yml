@@ -29,7 +29,6 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./DbScripts:/dbscripts
     networks:
       - backend
     deploy:
