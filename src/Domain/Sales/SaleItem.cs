@@ -18,19 +18,15 @@ public class SaleItem
 
     protected SaleItem() { }
 
-    public SaleItem(
-        ExternalIdentity product,
-        int quantity,
-        decimal unitPrice)
+    public SaleItem(ExternalIdentity product, int quantity, decimal unitPrice, decimal discount)
     {
-        ValidateQuantity(quantity);
         Id = Guid.NewGuid();
         ProductId = product.ExternalId;
         ProductDescription = product.Description;
         Quantity = quantity;
         UnitPrice = unitPrice;
-        Discount = CalculateDiscount();
-        TotalAmount = quantity * unitPrice - Discount;
+        Discount = discount;
+        TotalAmount = quantity * unitPrice - discount;
     }
 
     public void Cancel()
@@ -39,33 +35,39 @@ public class SaleItem
         TotalAmount = 0;
     }
 
-    private void ValidateQuantity(int quantity)
+    private static decimal CalculateDiscount(int quantity, decimal unitPrice)
     {
-        if (quantity > 20)
-        {
-            throw new DomainException(SaleErrors.MaxQuantityInvalid(quantity).Description);
-        }
+        decimal total = quantity * unitPrice;
 
-        if (quantity <= 0)
-        {
-            throw new DomainException(SaleErrors.MinQuantityInvalid(quantity).Description);
-        }
-    }
-
-    private decimal CalculateDiscount()
-    {
-        decimal total = Quantity * UnitPrice;
-
-        if (Quantity >= 10)
+        if (quantity >= 10)
         {
             return total * 0.20m;
         }
 
-        if (Quantity >= 4)
+        if (quantity >= 4)
         {
             return total * 0.10m;
         }
 
         return 0;
+    }
+
+    public static Result<SaleItem> Create(ExternalIdentity product, int quantity, decimal unitPrice)
+    {
+        if (quantity <= 0)
+        {
+            return Result.Failure<SaleItem>(SaleErrors.MinQuantityInvalid(quantity));
+        }
+
+        if (quantity > 20)
+        {
+            return Result.Failure<SaleItem>(SaleErrors.MaxQuantityInvalid(quantity));
+        }
+
+        decimal discount = CalculateDiscount(quantity, unitPrice);
+
+        var item = new SaleItem(product, quantity, unitPrice, discount);
+
+        return Result.Success(item);
     }
 }

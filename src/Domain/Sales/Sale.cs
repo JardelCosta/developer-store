@@ -34,16 +34,18 @@ public class Sale : Entity
         BranchDescription = branch.Description;
     }
 
-    public void AddItem(SaleItem item)
+    public Result AddItem(SaleItem item)
     {
         if (IsCancelled)
         {
-            throw new DomainException(SaleErrors.CancelledSale().Description);
+            return Result.Failure(SaleErrors.CancelledSale());
         }
 
         _items.Add(item);
 
         RecalculateTotal();
+
+        return Result.Success();
     }
 
     public void Cancel()
@@ -63,13 +65,18 @@ public class Sale : Entity
         TotalAmount = 0;
     }
 
-    public void CancelItem(Guid itemId)
+    public Result CancelItem(Guid itemId)
     {
-        SaleItem item = _items.FirstOrDefault(i => i.Id == itemId)
-            ?? throw new DomainException(SaleErrors.NotFound(itemId).Description);
+        SaleItem item = _items.FirstOrDefault(i => i.Id == itemId);
+        if (item == null)
+        {
+            return Result.Failure(SaleErrors.NotFound(itemId));
+        }
 
         item.Cancel();
         RecalculateTotal();
+
+        return Result.Success();
     }
 
     private void RecalculateTotal()
