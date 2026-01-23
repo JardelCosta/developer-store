@@ -4,15 +4,15 @@ using Domain.Sales;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
-namespace Application.UseCases.Sales.Queries.List;
+namespace Application.UseCases.Sales.Queries.GetAll;
 
-internal sealed class ListSalesQueryHandler(IApplicationDbContext context) : IQueryHandler<ListSalesQuery, List<SaleResponse>>
+internal sealed class GetAllSalesQueryHandler(IApplicationDbContext context) : IQueryHandler<GetAllSalesQuery, List<SaleResponse>>
 {
     private readonly int minPageNumber = 1;
     private readonly int minPageSize = 1;
     private readonly int maxPageSize = 20;
 
-    public async Task<Result<List<SaleResponse>>> Handle(ListSalesQuery query, CancellationToken cancellationToken)
+    public async Task<Result<List<SaleResponse>>> Handle(GetAllSalesQuery query, CancellationToken cancellationToken)
     {
         int pageNumber = query.PageNumber;
         int pageSize = query.PageSize;

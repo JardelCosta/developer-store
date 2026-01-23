@@ -10,7 +10,7 @@ internal sealed class GetById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("sales/{id:guid}", async (
+        app.MapGet("get/{id:guid}", async (
             Guid id,
             IQueryHandler<GetSaleByIdQuery, SaleResponse> handler,
             CancellationToken cancellationToken) =>

@@ -20,7 +20,7 @@ internal sealed class Create : IEndpoint
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("sales", async (
+        app.MapPost("create", async (
             Request request,
             ICommandHandler<CreateSaleCommand, Guid> handler,
             CancellationToken cancellationToken) =>

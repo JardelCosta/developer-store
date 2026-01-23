@@ -1,23 +1,23 @@
 ﻿using Application.Abstractions.Messaging;
-using Application.UseCases.Sales.Queries.List;
+using Application.UseCases.Sales.Queries.GetAll;
 using SharedKernel;
 using Web.Api.Extensions;
 using Web.Api.Infrastructure;
 
 namespace Web.Api.Endpoints.Sales;
 
-internal sealed class List : IEndpoint
+internal sealed class GetAll : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("list", async (
+        app.MapGet("get-all", async (
             int pageNumber,
             int pageSize,
-            IQueryHandler<ListSalesQuery,
+            IQueryHandler<GetAllSalesQuery,
             List<SaleResponse>> handler,
             CancellationToken cancellationToken) =>
         {
-            var query = new ListSalesQuery(pageNumber, pageSize);
+            var query = new GetAllSalesQuery(pageNumber, pageSize);
 
             Result<List<SaleResponse>> result = await handler.Handle(query, cancellationToken);
 

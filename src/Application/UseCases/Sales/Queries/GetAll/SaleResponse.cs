@@ -1,6 +1,6 @@
 ﻿using Domain.Sales;
 
-namespace Application.UseCases.Sales.Queries.List;
+namespace Application.UseCases.Sales.Queries.GetAll;
 public class SaleResponse
 {
     public Guid Id { get; set; }
