@@ -16,6 +16,7 @@ public class Sale : Entity
     public decimal TotalAmount { get; private set; }
     public bool IsCancelled { get; private set; }
 
+
     public IReadOnlyCollection<SaleItem> Items => _items;
     public virtual ExternalIdentity Customer { get; set; }
     public virtual ExternalIdentity Branch { get; set; }

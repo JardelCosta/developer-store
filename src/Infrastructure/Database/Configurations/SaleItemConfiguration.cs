@@ -7,11 +7,11 @@ internal sealed class SaleItemConfiguration : IEntityTypeConfiguration<SaleItem>
 {
     public void Configure(EntityTypeBuilder<SaleItem> builder)
     {
-        builder.HasKey(t => t.Id);
-        builder.Property(p => p.TotalAmount).IsRequired().HasDefaultValue(0);
-        builder.Property(p => p.IsCancelled).IsRequired().HasDefaultValue(false);
-        builder.Property(p => p.SaleId).IsRequired();
-        builder.Ignore(x => x.Product);
-        builder.HasQueryFilter(t => !t.IsCancelled);
+        builder.HasKey(item => item.Id);
+        builder.Property(item => item.TotalAmount).IsRequired().HasDefaultValue(0);
+        builder.Property(item => item.IsCancelled).IsRequired().HasDefaultValue(false);
+        builder.Property(item => item.SaleId).IsRequired();
+        builder.Ignore(item => item.Product);
+        builder.HasQueryFilter(item => !item.IsCancelled);
     }
 }

@@ -14,7 +14,7 @@ internal sealed class SaleConfiguration : IEntityTypeConfiguration<Sale>
         builder.Property(p => p.SaleDate).IsRequired();
         builder.Property(p => p.CustomerDescription).IsRequired().HasMaxLength(200);
         builder.Property(p => p.BranchDescription).IsRequired().HasMaxLength(200);
-        builder.HasQueryFilter(t => !t.IsCancelled);
+        builder.HasQueryFilter(sale => !sale.IsCancelled);
         builder.Ignore(x => x.Branch).Ignore(x => x.Customer);
 
         builder.HasMany(s => s.Items).WithOne(i => i.Sale).HasForeignKey(i => i.SaleId).OnDelete(DeleteBehavior.Cascade);
