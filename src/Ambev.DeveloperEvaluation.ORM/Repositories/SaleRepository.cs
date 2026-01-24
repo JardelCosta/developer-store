@@ -1,5 +1,8 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿using Ambev.DeveloperEvaluation.Domain.Common;
+using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.ORM.DomainEvents;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ambev.DeveloperEvaluation.ORM.Repositories;
@@ -10,14 +13,16 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories;
 public class SaleRepository : ISaleRepository
 {
     private readonly DefaultContext _context;
+    private readonly DomainEventsDispatcher? _domainEventsDispatcher;
 
     /// <summary>
     /// Initializes a new instance of SaleRepository
     /// </summary>
     /// <param name="context">The database context</param>
-    public SaleRepository(DefaultContext context)
+    public SaleRepository(DefaultContext context, DomainEventsDispatcher? domainEventsDispatcher = null)
     {
         _context = context;
+        _domainEventsDispatcher = domainEventsDispatcher;
     }
 
     /// <summary>
@@ -30,7 +35,33 @@ public class SaleRepository : ISaleRepository
     {
         await _context.Sales.AddAsync(sale, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+        await PublishDomainEventsAsync();
         return sale;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private async Task PublishDomainEventsAsync()
+    {
+        var domainEvents = _context.ChangeTracker
+            .Entries<BaseEntity>()
+            .Select(entry => entry.Entity)
+            .SelectMany(entity =>
+            {
+                List<IDomainEvent> domainEvents = entity.DomainEvents;
+
+                entity.ClearDomainEvents();
+
+                return domainEvents;
+            })
+            .ToList();
+
+        if (_domainEventsDispatcher != null)
+        {
+            await _domainEventsDispatcher.DispatchAsync(domainEvents);
+        }
     }
 
     /// <summary>

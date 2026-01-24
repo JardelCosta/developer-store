@@ -1,5 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Common;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentValidation;
@@ -43,7 +44,7 @@ public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleRe
 
         var existingSale = await _saleRepository.GetBySaleNumberAsync(command.SaleNumber, cancellationToken);
         if (existingSale != null)
-            throw new InvalidOperationException($"Sale with email {command.SaleNumber} already exists");
+            throw new InvalidOperationException($"Sale with number {command.SaleNumber} already exists");
 
         var sale = new Sale(
                             command.SaleNumber,
@@ -58,6 +59,8 @@ public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleRe
 
             sale.AddItem(item);
         }
+
+        sale.Raise(new SaleCreatedEvent(sale.Id));
 
         var createdSale = await _saleRepository.CreateAsync(sale, cancellationToken);
         var result = _mapper.Map<CreateSaleResult>(createdSale);
