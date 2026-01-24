@@ -39,6 +39,20 @@ public class SaleRepository : ISaleRepository
     }
 
     /// <summary>
+    /// Cancel a sale in the database
+    /// </summary>
+    /// <param name="sale">The sale to cancel</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The cancelled sale</returns>
+    public async Task<Sale> CancelAsync(Sale sale, CancellationToken cancellationToken = default)
+    {
+        sale.Cancel();
+        _context.Sales.Update(sale);
+        await SaveChangesAndPublishEventsAsync(cancellationToken);
+        return sale;
+    }
+
+    /// <summary>
     /// Retrieves a sale by their unique identifier
     /// </summary>
     /// <param name="id">The unique identifier of the sale</param>
