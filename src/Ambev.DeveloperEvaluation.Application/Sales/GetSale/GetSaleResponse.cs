@@ -1,11 +1,11 @@
-using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 
-namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale;
+namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 
 /// <summary>
-/// API response model for GetSale operation
+/// Response model for GetSale operation
 /// </summary>
-public class GetSaleResponse
+public class SaleResponse
 {
     public Guid Id { get; set; }
     public string SaleNumber { get; set; }
@@ -17,9 +17,9 @@ public class GetSaleResponse
     public decimal TotalAmount { get; set; }
     public List<SaleItemResponse> Items { get; set; } = new();
 
-    public static GetSaleResponse Map(SaleResponse sale)
+    public static SaleResponse Map(Sale sale)
     {
-        return new GetSaleResponse
+        return new SaleResponse
         {
             Id = sale.Id,
             SaleNumber = sale.SaleNumber,
@@ -37,7 +37,7 @@ public class GetSaleResponse
                 Quantity = item.Quantity,
                 UnitPrice = item.UnitPrice,
                 Discount = item.Discount,
-                TotalPrice = item.TotalPrice
+                TotalPrice = item.TotalAmount
             })]
         };
     }

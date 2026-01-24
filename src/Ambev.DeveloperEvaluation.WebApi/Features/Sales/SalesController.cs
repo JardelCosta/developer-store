@@ -117,7 +117,7 @@ public class SalesController : BaseController
         {
             Success = true,
             Message = "Sale retrieved successfully",
-            Data = _mapper.Map<GetSaleResponse>(response)
+            Data = GetSaleResponse.Map(response)
         });
     }
 
