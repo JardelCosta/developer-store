@@ -34,34 +34,8 @@ public class SaleRepository : ISaleRepository
     public async Task<Sale> CreateAsync(Sale sale, CancellationToken cancellationToken = default)
     {
         await _context.Sales.AddAsync(sale, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-        await PublishDomainEventsAsync();
+        await SaveChangesAndPublishEventsAsync(cancellationToken);
         return sale;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    private async Task PublishDomainEventsAsync()
-    {
-        var domainEvents = _context.ChangeTracker
-            .Entries<BaseEntity>()
-            .Select(entry => entry.Entity)
-            .SelectMany(entity =>
-            {
-                List<IDomainEvent> domainEvents = entity.DomainEvents;
-
-                entity.ClearDomainEvents();
-
-                return domainEvents;
-            })
-            .ToList();
-
-        if (_domainEventsDispatcher != null)
-        {
-            await _domainEventsDispatcher.DispatchAsync(domainEvents);
-        }
     }
 
     /// <summary>
@@ -93,14 +67,43 @@ public class SaleRepository : ISaleRepository
     /// <param name="id">The unique identifier of the sale to delete</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if the sale was deleted, false if not found</returns>
-    public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteAsync(Sale sale, CancellationToken cancellationToken = default)
     {
-        var sale = await GetByIdAsync(id, cancellationToken);
         if (sale == null)
             return false;
 
         _context.Sales.Remove(sale);
-        await _context.SaveChangesAsync(cancellationToken);
+        await SaveChangesAndPublishEventsAsync(cancellationToken);
         return true;
+    }
+
+    private async Task SaveChangesAndPublishEventsAsync(CancellationToken cancellationToken = default)
+    {
+        await _context.SaveChangesAsync(cancellationToken);
+        await PublishDomainEventsAsync();
+    }
+
+    /// <summary>
+    /// Publishes domain events for all tracked entities
+    /// </summary>
+    private async Task PublishDomainEventsAsync()
+    {
+        var domainEvents = _context.ChangeTracker
+            .Entries<BaseEntity>()
+            .Select(entry => entry.Entity)
+            .SelectMany(entity =>
+            {
+                List<IDomainEvent> domainEvents = entity.DomainEvents;
+
+                entity.ClearDomainEvents();
+
+                return domainEvents;
+            })
+            .ToList();
+
+        if (_domainEventsDispatcher != null && domainEvents.Count > 0)
+        {
+            await _domainEventsDispatcher.DispatchAsync(domainEvents);
+        }
     }
 }

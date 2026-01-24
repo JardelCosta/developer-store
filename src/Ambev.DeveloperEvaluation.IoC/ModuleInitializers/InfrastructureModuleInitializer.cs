@@ -1,4 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
+﻿using Ambev.DeveloperEvaluation.Application.Sales.DeleteSale;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.ORM;
@@ -20,7 +21,7 @@ public class InfrastructureModuleInitializer : IModuleInitializer
         builder.Services.AddTransient<DomainEventsDispatcher>();
 
         builder.Services.Scan(scan => scan
-            .FromAssemblies(typeof(CreateSaleHandler).Assembly)
+            .FromAssemblies(typeof(Sale).Assembly, typeof(DeleteSaleHandler).Assembly)
             .AddClasses(classes => classes
                 .AssignableTo(typeof(IDomainEventHandler<>))
                 .Where(type => !type.IsAbstract && !type.IsInterface))
