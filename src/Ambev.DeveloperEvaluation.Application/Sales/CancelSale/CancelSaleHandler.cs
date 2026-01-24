@@ -28,7 +28,7 @@ public class CancelSaleHandler : IRequestHandler<CancelSaleCommand, CancelSaleRe
     /// </summary>
     /// <param name="request">The CancelSale command</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>The result of the delete operation</returns>
+    /// <returns>The result of the cancel operation</returns>
     public async Task<CancelSaleResponse> Handle(CancelSaleCommand request, CancellationToken cancellationToken)
     {
         var validator = new CancelSaleValidator();

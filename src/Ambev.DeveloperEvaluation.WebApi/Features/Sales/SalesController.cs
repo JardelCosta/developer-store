@@ -63,29 +63,31 @@ public class SalesController : BaseController
     }
 
     /// <summary>
-    /// Cancel a sale
+    /// Cancel a sale by their ID
     /// </summary>
-    /// <param name="request">The sale cancellation request</param>
+    /// <param name="id">The unique identifier of the sale to cancel</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>The created sale details</returns>
-    [HttpPut]
-    [ProducesResponseType(typeof(ApiResponseWithData<CreateSaleResponse>), StatusCodes.Status201Created)]
+    /// <returns>Success response if the sale was cancelled</returns>
+    [HttpPut("{id}")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CancelSale([FromBody] CancelSaleRequest request, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CancelSale([FromRoute] Guid id, CancellationToken cancellationToken)
     {
+        var request = new CancelSaleRequest { Id = id };
         var validator = new CancelSaleRequestValidator();
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors);
 
-        var response = await _mediator.Send(new CancelSaleRequest { Id = request.Id }, cancellationToken);
+        var command = _mapper.Map<CancelSaleCommand>(request.Id);
+        await _mediator.Send(command, cancellationToken);
 
-        return Created(string.Empty, new ApiResponseWithData<CancelSaleResponse>
+        return Ok(new ApiResponse
         {
             Success = true,
-            Message = "Sale cancelled successfully",
-            Data = _mapper.Map<CancelSaleResponse>(response)
+            Message = "Sale cancelled successfully"
         });
     }
 
